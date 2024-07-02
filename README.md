@@ -89,23 +89,144 @@ Ketika sistem Linux mengalami kekurangan memori kritis, kernel akan mengaktifkan
 OOM killer memilih proses berdasarkan "badness score". Nilai ini dipengaruhi oleh penggunaan memori, waktu eksekusi, prioritas, dan status root proses. Proses dengan nilai badness tertinggi akan dihentikan.
 
 
-**8. Explain the following command : (date ; ps -ef | awk '{print $1}'| sort |
-uniq | wc -l) >> Activity.log**
+**8. Explain the following command : ```(date ; ps -ef | awk '{print $1}'| sort |
+uniq | wc -l) >> Activity.log```**
 
+Penjelasan:
 
+Perintah ini menjalankan serangkaian tindakan, yang hasilnya akan dicatat dalam file bernama "Activity.log".
 
-9. Server A cannot talk to Server B. Describe possible reasons!
-10. How to know which process in Linux listens on a specific port?
-11. An engineer type http://www.yahoo.com in the browser and he/she presses enter.
+- ```date```: Menampilkan tanggal dan waktu saat ini. Output ini akan menjadi bagian pertama dari catatan di dalam file log.
+- ```ps -ef```: Menampilkan semua proses yang sedang berjalan di sistem, termasuk detail seperti ID pengguna, ID proses, dan perintah yang menjalankan proses tersebut.
+- ```awk '{print $1}'```: Memfilter output dari ps -ef. Bagian ini akan mengambil kolom pertama dari setiap baris output ps -ef, yang merupakan ID pengguna yang menjalankan proses.
+- ```sort```: Mengurutkan ID pengguna yang dihasilkan secara alfabetis atau numerik.
+- ```uniq```: Menghilangkan ID pengguna yang duplikat, sehingga hanya menyisakan satu kemunculan dari setiap ID pengguna.
+- ```wc -l```: Menghitung jumlah baris yang tersisa, yang menunjukkan jumlah pengguna unik yang menjalankan proses pada saat itu.
+- ```( ... ) >> Activity.log```: Mengelompokkan semua perintah sebelumnya dalam satu unit, kemudian mengarahkan output gabungan dari perintah-perintah tersebut ke file "Activity.log". Tanda >> berarti output akan ditambahkan di akhir file log, sehingga catatan aktivitas sebelumnya tidak akan ditimpa.
+
+Contoh Output di Activity.log:
+```
+Sel 02 Jul 2024 17:43:25 WITA
+5
+```
+
+Perintah ini pada dasarnya mencatat tanggal, waktu, dan jumlah pengguna unik yang sedang menjalankan proses di sistem Anda ke dalam file "Activity.log".
+
+**9. Server A cannot talk to Server B. Describe possible reasons!**
+
+Server A tidak dapat berkomunikasi dengan Server B karena beberapa kemungkinan:
+
+Jaringan:
+- Kabel atau port rusak
+- Alamat IP salah atau subnet berbeda
+- Firewall memblokir lalu lintas
+- Rute jaringan tidak benar
+- Masalah pada switch atau router
+
+Perangkat Lunak:
+- Layanan jaringan tidak berjalan
+- Konfigurasi layanan salah
+- Konflik perangkat lunak
+
+**10. How to know which process in Linux listens on a specific port?**
+
+disini saya menggunakan perintah ```ss``` untuk mencari tahu proses yang menggunakan port tertentu:
+
+- Semua port TCP: ```ss -ltn```
+- Port tertentu (misal, port 80): ```ss -ltn '( sport = :80 )'```
+
+**11. An engineer type http://www.yahoo.com in the browser and he/she presses enter.
 What happens next? (hint: describe activities happening at every OSI layer - physical,
-data link, network, transport, session, presentation, application layer)
-12. What about if the engineer change from http://www.yahoo.com into
+data link, network, transport, session, presentation, application layer)**
+
+- Lapisan Fisik: Frame Ethernet diubah menjadi sinyal listrik/cahaya yang dikirim melalui kabel.
+- Lapisan Data Link: Paket-paket IP diubah menjadi frame Ethernet dengan alamat MAC.
+- Lapisan Jaringan (IP): Menambahkan alamat IP tujuan (Yahoo) dan sumber (komputer Anda) ke setiap paket.
+- Lapisan Transportasi (TCP): Membagi permintaan menjadi paket-paket data kecil dan memastikan semuanya sampai dengan benar.
+- Lapisan Sesi: Mengelola sesi komunikasi antara peramban dan server Yahoo.
+- Lapisan Presentasi: Jika HTTPS, data permintaan dienkripsi untuk keamanan.
+- Lapisan Aplikasi: Peramban menerima "http://www.yahoo.com", menentukan protokol (HTTP/HTTPS), dan membuat permintaan untuk situs tersebut.
+
+**12. What about if the engineer change from http://www.yahoo.com into
 https://www.yahoo.com ? (hint : describe activities related to public/private
-certificates, CAs, proxying, MiTM, etc)
-13. A web developer is creating a new web application and you have to store the user’s
-passwords in a database. How would you store the passwords securely?
-14. A DevOps engineer have added a public ssh key of a developer into
+certificates, CAs, proxying, MiTM, etc)**
+
+Perubahan dari HTTP ke HTTPS pada www.yahoo.com berdampak signifikan pada keamanan. Ketika beralih ke HTTPS, browser pengguna akan meminta sertifikat digital dari situs web Yahoo. Sertifikat ini, yang dikeluarkan oleh Otoritas Sertifikat (CA) terpercaya, bertindak sebagai tanda pengenal digital Yahoo dan memastikan keaslian situs web.
+
+Sertifikat tersebut berisi kunci publik yang digunakan untuk memulai proses enkripsi, mengamankan data yang dikirim antara browser pengguna dan server Google. Hanya server Google yang memiliki kunci privat yang cocok untuk mendekripsi data tersebut, sehingga melindungi data dari serangan Man-in-the-Middle (MiTM). HTTPS juga memastikan integritas data, artinya data yang diterima adalah data asli yang dikirim.
+
+**13. A web developer is creating a new web application and you have to store the user’s
+passwords in a database. How would you store the passwords securely?**
+
+berikut cara untuk menyimpan password pengguna dengan aman di dalam database
+- Jangan Simpan Password dalam Teks Biasa (Plain Text):
+Menyimpan password dalam teks biasa sangat tidak aman. Jika database diretas, semua password pengguna akan terbuka.
+- Gunakan Hashing:
+Hashing adalah proses mengubah password menjadi string unik yang tidak bisa dikembalikan ke bentuk aslinya. Gunakan algoritma hashing yang kuat seperti bcrypt, Argon2, atau scrypt.
+- Tambahkan Salt:
+Salt adalah data acak yang ditambahkan ke password sebelum di-hash. Ini bertujuan untuk memastikan bahwa password yang sama tidak menghasilkan hash yang sama.
+- Gunakan Iterasi yang Cukup:
+Algoritma hashing modern seperti bcrypt, Argon2, dan scrypt memungkinkan penambahan jumlah iterasi untuk meningkatkan keamanan.
+- Pembaruan dan Pengelolaan:
+Secara berkala, periksa dan perbarui metode hashing yang digunakan. Algoritma yang aman hari ini mungkin tidak aman di masa depan, jadi penting untuk tetap mengikuti perkembangan terbaru dalam keamanan kriptografi.
+- Keamanan Server:
+Selain mengamankan password, pastikan server dan aplikasi web memiliki keamanan yang baik. Gunakan HTTPS untuk enkripsi data dalam perjalanan, perbarui perangkat lunak secara berkala, dan terapkan kebijakan keamanan yang ketat.
+
+**14. A DevOps engineer have added a public ssh key of a developer into**
 authorized_keys but the developer is still getting a password prompt, what can be
 wrong?
-15. Describe the Linux boot process with as much detail as possible, starting from when
-the system is powered on and ending when you get a prompt!
+
+Kemungkinan Masalah:
+
+- Izin File yang Salah: File "authorized_keys" atau direktori ".ssh" mungkin memiliki izin yang terlalu terbuka.
+- Konfigurasi SSH Server: Opsi ```PubkeyAuthentication``` dan ```AuthorizedKeysFile``` mungkin tidak diaktifkan dalam konfigurasi SSH server.
+- Penggunaan Kunci yang Salah: Pengembang mungkin menggunakan kunci privat yang tidak sesuai.
+- Masalah pada Kunci SSH: Kunci SSH mungkin rusak atau tidak valid.
+- Masalah Jaringan: Firewall atau masalah konektivitas lainnya mungkin mengganggu proses otentikasi.
+- Otentikasi Multi-Faktor: Server mungkin memerlukan otentikasi tambahan selain kunci SSH.
+
+**15. Describe the Linux boot process with as much detail as possible, starting from when
+the system is powered on and ending when you get a prompt!**
+
+berikut proses boot Linux secara detail, dimulai dari saat komputer dinyalakan hingga muncul prompt:
+
+1. Power On Self Test (POST):
+
+Saat tombol power ditekan, BIOS (Basic Input/Output System) atau UEFI (Unified Extensible Firmware Interface) melakukan POST untuk memeriksa hardware dasar (RAM, CPU, penyimpanan) dan memastikannya berfungsi.
+
+2. Boot Loader:
+
+Setelah POST berhasil, BIOS/UEFI mencari bootloader. Biasanya, bootloader yang umum digunakan adalah GRUB (Grand Unified Bootloader). GRUB menampilkan menu yang memungkinkan pengguna memilih sistem operasi mana yang akan di-boot (jika ada beberapa sistem operasi yang terpasang) atau langsung memulai Linux jika hanya satu yang ada.
+
+3. Kernel Loading:
+
+Ketika opsi Linux dipilih, bootloader memuat kernel Linux (inti dari sistem operasi) dari hard drive atau media penyimpanan lain ke dalam memori (RAM).
+
+4. Kernel Decompression and Initialization:
+
+Setelah dimuat ke memori, kernel Linux mendekompresi dirinya sendiri (karena biasanya dikompres untuk menghemat ruang) dan memulai proses inisialisasi. Ini termasuk pengaturan hardware dasar, memori virtual, inisialisasi perangkat keras yang penting (misalnya, keyboard, mouse), dan memuat driver perangkat keras dasar.
+
+5. initramfs (optional):
+
+Beberapa distribusi Linux menggunakan initramfs (initial RAM filesystem), yaitu sistem file sementara yang dimuat ke RAM untuk membantu inisialisasi perangkat keras yang lebih kompleks sebelum sistem file root sebenarnya dimuat.
+
+6. Root Filesystem Mounting:
+
+Kernel kemudian memasang (mount) root filesystem (biasanya /) dari hard drive atau media penyimpanan lainnya. Sistem file ini berisi semua file dan direktori yang diperlukan untuk sistem operasi berfungsi.
+
+7. System Initialization (init):
+
+Proses init (biasanya systemd pada distribusi Linux modern) dimulai. Proses ini adalah "induk" dari semua proses lain dalam sistem dan bertanggung jawab untuk memulai layanan-layanan penting (daemon) yang dibutuhkan untuk operasi sistem, seperti jaringan, tampilan grafis, login, dan sebagainya.
+
+8. Runlevel/Target Execution:
+
+Systemd menjalankan "target" tertentu (setara dengan runlevel pada sistem init lama). Target ini menentukan layanan mana yang akan dimulai dan dalam mode apa sistem akan berjalan. Misalnya, target "graphical.target" memulai lingkungan desktop grafis.
+
+9. Login Prompt:
+
+Setelah semua layanan yang diperlukan dimulai, Anda akan disajikan dengan layar login di mana Anda dapat memasukkan nama pengguna dan kata sandi untuk mengakses sistem.
+
+10. Shell Prompt:
+
+Setelah login berhasil, Anda akan mendapatkan shell prompt (biasanya $ atau #), menandakan Anda siap untuk berinteraksi dengan sistem dan menjalankan perintah.
+
