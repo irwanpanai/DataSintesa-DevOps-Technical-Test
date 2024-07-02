@@ -1,0 +1,1 @@
+# DataSintesa-DevOps-Technical-Test
